@@ -5,7 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import Controller.Controller;
 
-import static Controller.Controller.SaveCSV;
+import static Controller.Controller.SaveInvoiceHeader;
 import static Controller.Controller.ScanCSV;
 
 public class InvoicesTable extends View.InvoiceFrame
@@ -15,5 +15,12 @@ public class InvoicesTable extends View.InvoiceFrame
     {
         ScanCSV();
     }
-    public static void SaveFile() throws IOException { SaveCSV();}
+    public static void SaveFile() {
+        try {
+            SaveInvoiceHeader();
+        } catch (IOException cannotSave) {
+            JOptionPane.showMessageDialog(null, "Can't Save  the File", "Saving is Blocked", JOptionPane.ERROR_MESSAGE);
+            cannotSave.printStackTrace();
+        }
+    }
 }

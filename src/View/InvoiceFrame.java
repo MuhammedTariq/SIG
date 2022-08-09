@@ -1,6 +1,9 @@
 package View;
 
 import Controller.Controller;
+import Model.Invoice;
+import Model.InvoicesTable;
+import Model.LineTable;
 
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
@@ -11,6 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
+import static Controller.Controller.invoiceLinesTable;
+import static Controller.Controller.invoicesHeaderTable;
+import static Model.Invoice.invoiceNumValue;
 import static Model.InvoicesTable.LoadFile;
 
 public class InvoiceFrame extends JFrame implements ActionListener
@@ -37,7 +43,7 @@ public class InvoiceFrame extends JFrame implements ActionListener
     private JTextField customerName = new JTextField(50);
     private JTextField invoiceDate = new JTextField(50);
     private JTextField invoiceNum = new JTextField(50);
-    public static JTable invoiceItemsTable = new JTable(1,5);
+    public static JTable invoiceItemsTable = new JTable(4,5);
     private JButton createNewLine = new JButton("Create New Line");
     private JButton deleteLine = new JButton("Delete Line");
     private JPanel invoiceDetailsForm = new JPanel();
@@ -79,9 +85,9 @@ public class InvoiceFrame extends JFrame implements ActionListener
         deleteInvoice.addActionListener(this);
         deleteInvoice.setActionCommand("DeleteInvoicePressed");
         createNewLine.addActionListener(this);
-        createNewLine.setActionCommand("InvoiceSavePressed");
+        createNewLine.setActionCommand("CreateNewLinePressed");
         deleteLine.addActionListener(this);
-        deleteLine.setActionCommand("CancelPressed");
+        deleteLine.setActionCommand("DeleteLinePressed");
 
         fileMenu.add(loadFile);
         fileMenu.add(saveFile);
@@ -99,7 +105,7 @@ public class InvoiceFrame extends JFrame implements ActionListener
         invoicesForm.setLayout(new GridLayout(2, 1));
         invoicesForm.setBorder(BorderFactory.createTitledBorder("Invoices Table"));
         invoicesForm.add(invoicesTable);
-        invoicesTable.setEnabled(false);
+//        invoicesTable.setEnabled(false);
 //        invoicesTable.setCellEditor(Disabled );
 ////        invoicesTable.getCellEditor();
 //        invoicesTable.setColumnSelectionAllowed(false);
@@ -125,9 +131,11 @@ public class InvoiceFrame extends JFrame implements ActionListener
         invoiceNum.setEnabled(false);
         invoiceDateForm.add(invoiceDateLbl);
         invoiceDateForm.add(invoiceDate);
+        invoiceDate.setEnabled(false);
         invoiceDateForm.setLayout(new FlowLayout(FlowLayout.LEFT));
         customerNameForm.add(customerNameLbl);
         customerNameForm.add(customerName);
+        customerName.setEnabled(false);
         customerNameForm.setLayout(new FlowLayout(FlowLayout.LEFT));
         invoiceTotalForm.add(invoiceTotalLbl);
         invoiceTotalForm.add(invoiceTotal);
@@ -144,10 +152,12 @@ public class InvoiceFrame extends JFrame implements ActionListener
         invoiceItemsForm.setBorder(BorderFactory.createTitledBorder("Invoice Items"));
         invoiceItemsForm.setLayout(new GridLayout(1, 1));
         invoiceItemsForm.add(invoiceItemsTable);
+        invoiceItemsTable.setEnabled(false);
         Controller.addInvoiceItemsTableHeader();
         invoiceDetailsFooterButtons.add(createNewLine);
         invoiceDetailsFooterButtons.add(deleteLine);
-
+        createNewLine.setEnabled(false);
+        deleteLine.setEnabled(false);
 
         setJMenuBar(mainMenuBar);
         add(mainPanel);
@@ -165,11 +175,8 @@ public class InvoiceFrame extends JFrame implements ActionListener
         }
         if (ButtonPressed.getActionCommand().equals("SavePressed"))
         {
-            try {
-                Controller.SaveFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            InvoicesTable.SaveFile();
+            LineTable.SaveFile();
         }
         if (ButtonPressed.getActionCommand().equals("ExitPressed"))
         {
@@ -180,19 +187,24 @@ public class InvoiceFrame extends JFrame implements ActionListener
         }
         if (ButtonPressed.getActionCommand().equals("CreateNewInvoicePressed"))
         {
-
+            customerName.setEnabled(true);
+            invoiceDate.setEnabled(true);
+            invoiceNumValue = invoiceNumValue + 1;
+            invoiceNum.setText(String.valueOf(invoiceNumValue));
+            createNewLine.setEnabled(true);
+            deleteLine.setEnabled(true);
         }
         if (ButtonPressed.getActionCommand().equals("DeleteInvoicePressed"))
         {
-
+            invoicesHeaderTable.removeRow(invoicesTable.getSelectedRow());
         }
-        if (ButtonPressed.getActionCommand().equals("InvoiceSavePressed"))
+        if (ButtonPressed.getActionCommand().equals("CreateNewLinePressed"))
         {
-
+            invoiceItemsTable.setEnabled(true);
         }
-        if (ButtonPressed.getActionCommand().equals("CancelPressed"))
+        if (ButtonPressed.getActionCommand().equals("DeleteLinePressed"))
         {
-
+            invoiceLinesTable.removeRow(invoiceItemsTable.getSelectedRow());
         }
     }
     public static void main(String[] args)

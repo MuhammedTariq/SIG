@@ -16,8 +16,10 @@ public class Controller extends InvoicesTable
     static String Line = "";
     static Object[] ValuesData;
     static String[] ValuesRow;
-    static DefaultTableModel CSVTable =
+    public static DefaultTableModel invoicesHeaderTable =
             (DefaultTableModel) invoicesTable.getModel();
+    public static DefaultTableModel invoiceLinesTable =
+            (DefaultTableModel) invoiceItemsTable.getModel();
 
     public static void ScanCSV() {
         try {
@@ -32,7 +34,7 @@ public class Controller extends InvoicesTable
                 {
                     Line = ValuesData[i].toString().trim();
                     ValuesRow = Line.split(",");
-                    CSVTable.addRow(ValuesRow);
+                    invoicesHeaderTable.addRow(ValuesRow);
                 }
             }
             else
@@ -41,15 +43,15 @@ public class Controller extends InvoicesTable
                         "File Open is Canceled" , JOptionPane.INFORMATION_MESSAGE);
             }
         }
-        catch(FileNotFoundException FileNotFound)
+        catch(FileNotFoundException fileNotFound)
         {
             JOptionPane.showMessageDialog(null, "File Not Found", "No File", JOptionPane.ERROR_MESSAGE);
-            FileNotFound.printStackTrace();
+            fileNotFound.printStackTrace();
         }
-        catch(IOException NoLines2Read)
+        catch(IOException noLines2Read)
         {
             JOptionPane.showMessageDialog(null, "No Data Remains", "No Data", JOptionPane.ERROR_MESSAGE);
-            NoLines2Read.printStackTrace();
+            noLines2Read.printStackTrace();
         }
         finally
         {
@@ -57,13 +59,14 @@ public class Controller extends InvoicesTable
             {
                 CSVReader.close();
             }
-            catch (IOException CannotClose)
+            catch (IOException cannotCloseReading)
             {
-                CannotClose.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Can't Stop Reading the File", "Stop Reading is Blocked", JOptionPane.ERROR_MESSAGE);
+                cannotCloseReading.printStackTrace();
             }
         }
     }
-    public static void SaveCSV () throws IOException {
+    public static void SaveInvoiceHeader () throws IOException {
         JFileChooser SaveForm = new JFileChooser();
         FileOutputStream SavingFile = null;
         int SaveResult = SaveForm.showSaveDialog(null);
@@ -72,27 +75,69 @@ public class Controller extends InvoicesTable
             String SavePath = SaveForm.getSelectedFile().getPath();
             FileWriter SaveCSV = new FileWriter(new File(SavePath));
                 try {
-                    for (int i = 0; i < CSVTable.getRowCount(); i++)
+                    for (int i = 0; i < invoicesHeaderTable.getRowCount(); i++)
                     {
-                        for (int j = 0; j < CSVTable.getColumnCount(); j++)
+                        for (int j = 0; j < invoicesHeaderTable.getColumnCount(); j++)
                         {
-                            SaveCSV.write(CSVTable.getValueAt(i,j) + ",");
+                            SaveCSV.write(invoicesHeaderTable.getValueAt(i,j) + ",");
                         }
                         SaveCSV.write("\n");
                     }
                     JOptionPane.showMessageDialog(null,
-                            "File is Saved Successfully",
+                            "Invoices File is Saved Successfully",
                             "Saved Successfully", JOptionPane.INFORMATION_MESSAGE);
-                } catch (IOException SaveException) {
-                    SaveException.printStackTrace();
+                } catch (IOException saveException) {
+                    JOptionPane.showMessageDialog(null, "Can't Save  the File", "Saving is Blocked", JOptionPane.ERROR_MESSAGE);
+                    saveException.printStackTrace();
                 } finally {
                     try {
                         SaveCSV.close();
-                    } catch (IOException CannotClose) {
-                        CannotClose.printStackTrace();
+                    } catch (IOException cannotCloseWriting) {
+                        JOptionPane.showMessageDialog(null, "Can't Stop Writing the File", "Stop Writing is Blocked", JOptionPane.ERROR_MESSAGE);
+                        cannotCloseWriting.printStackTrace();
                     }
                 }
             }
+        else
+        {
+            JOptionPane.showMessageDialog(null ,
+                    "The File Isn't Saved" , "File Save is Canceled"
+                    , JOptionPane.ERROR_MESSAGE);
+        }
+
+    }
+    public static void SaveInvoiceLines () throws IOException {
+        JFileChooser SaveForm = new JFileChooser();
+        FileOutputStream SavingFile = null;
+        int SaveResult = SaveForm.showSaveDialog(null);
+        if (SaveResult == JFileChooser.APPROVE_OPTION)
+        {
+            String SavePath = SaveForm.getSelectedFile().getPath();
+            FileWriter SaveCSV = new FileWriter(new File(SavePath));
+            try {
+                for (int i = 0; i < invoiceLinesTable.getRowCount(); i++)
+                {
+                    for (int j = 0; j < invoiceLinesTable.getColumnCount(); j++)
+                    {
+                        SaveCSV.write(invoiceLinesTable.getValueAt(i,j) + ",");
+                    }
+                    SaveCSV.write("\n");
+                }
+                JOptionPane.showMessageDialog(null,
+                        "Invoice Items File is Saved Successfully",
+                        "Saved Successfully", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException saveException) {
+                JOptionPane.showMessageDialog(null, "Can't Save  the File", "Saving is Blocked", JOptionPane.ERROR_MESSAGE);
+                saveException.printStackTrace();
+            } finally {
+                try {
+                    SaveCSV.close();
+                } catch (IOException cannotCloseWriting) {
+                    JOptionPane.showMessageDialog(null, "Can't Stop Writing the File", "Stop Writing is Blocked", JOptionPane.ERROR_MESSAGE);
+                    cannotCloseWriting.printStackTrace();
+                }
+            }
+        }
         else
         {
             JOptionPane.showMessageDialog(null ,
