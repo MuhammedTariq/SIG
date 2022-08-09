@@ -6,14 +6,14 @@ import java.io.IOException;
 import Controller.Controller;
 
 import static Controller.Controller.SaveInvoiceHeader;
-import static Controller.Controller.ScanCSV;
+import static Controller.Controller.ScanInvoicesHeader;
 
 public class InvoicesTable extends View.InvoiceFrame
 {
     static String FilePath ;
     public static void LoadFile()
     {
-        ScanCSV();
+        ScanInvoicesHeader();
     }
     public static void SaveFile() {
         try {

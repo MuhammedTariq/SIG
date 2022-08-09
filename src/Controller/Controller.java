@@ -21,7 +21,7 @@ public class Controller extends InvoicesTable
     public static DefaultTableModel invoiceLinesTable =
             (DefaultTableModel) invoiceItemsTable.getModel();
 
-    public static void ScanCSV() {
+    public static void ScanInvoicesHeader() {
         try {
             JFileChooser SelectForm = new JFileChooser();
             int SelectionResult = SelectForm.showOpenDialog(null);
@@ -35,6 +35,51 @@ public class Controller extends InvoicesTable
                     Line = ValuesData[i].toString().trim();
                     ValuesRow = Line.split(",");
                     invoicesHeaderTable.addRow(ValuesRow);
+                }
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(null , "There is No File Loaded" ,
+                        "File Open is Canceled" , JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+        catch(FileNotFoundException fileNotFound)
+        {
+            JOptionPane.showMessageDialog(null, "File Not Found", "No File", JOptionPane.ERROR_MESSAGE);
+            fileNotFound.printStackTrace();
+        }
+        catch(IOException noLines2Read)
+        {
+            JOptionPane.showMessageDialog(null, "No Data Remains", "No Data", JOptionPane.ERROR_MESSAGE);
+            noLines2Read.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                CSVReader.close();
+            }
+            catch (IOException cannotCloseReading)
+            {
+                JOptionPane.showMessageDialog(null, "Can't Stop Reading the File", "Stop Reading is Blocked", JOptionPane.ERROR_MESSAGE);
+                cannotCloseReading.printStackTrace();
+            }
+        }
+    }
+    public static void ScanInvoiceItems() {
+        try {
+            JFileChooser SelectForm = new JFileChooser();
+            int SelectionResult = SelectForm.showOpenDialog(null);
+            if (SelectionResult == JFileChooser.APPROVE_OPTION)
+            {
+                String FilePath = SelectForm.getSelectedFile().getPath();
+                CSVReader = new BufferedReader(new FileReader(FilePath));
+                ValuesData = CSVReader.lines().toArray();
+                for (int i = 0; i < ValuesData.length; i++)
+                {
+                    Line = ValuesData[i].toString().trim();
+                    ValuesRow = Line.split(",");
+                    invoiceLinesTable.addRow(ValuesRow);
                 }
             }
             else

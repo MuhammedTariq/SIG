@@ -1,11 +1,14 @@
 package View;
 
 import Controller.Controller;
+import Model.FileOperations;
 import Model.Invoice;
 import Model.InvoicesTable;
 import Model.LineTable;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
@@ -14,8 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-import static Controller.Controller.invoiceLinesTable;
-import static Controller.Controller.invoicesHeaderTable;
+import static Controller.Controller.*;
 import static Model.Invoice.invoiceNumValue;
 import static Model.InvoicesTable.LoadFile;
 
@@ -39,11 +41,11 @@ public class InvoiceFrame extends JFrame implements ActionListener
     public static JTable invoicesTable = new JTable(1,4);
     private JButton createNewInvoice = new JButton("Create Invoice");
     private JButton deleteInvoice = new JButton("Delete Invoice");
-    private JTextField invoiceTotal = new JTextField(50);
-    private JTextField customerName = new JTextField(50);
-    private JTextField invoiceDate = new JTextField(50);
-    private JTextField invoiceNum = new JTextField(50);
-    public static JTable invoiceItemsTable = new JTable(4,5);
+    public static JTextField invoiceTotal = new JTextField(50);
+    public static JTextField customerName = new JTextField(50);
+    public static JTextField invoiceDate = new JTextField(50);
+    public static JTextField invoiceNum = new JTextField(50);
+    public static JTable invoiceItemsTable = new JTable(1,5);
     private JButton createNewLine = new JButton("Create New Line");
     private JButton deleteLine = new JButton("Delete Line");
     private JPanel invoiceDetailsForm = new JPanel();
@@ -105,18 +107,26 @@ public class InvoiceFrame extends JFrame implements ActionListener
         invoicesForm.setLayout(new GridLayout(2, 1));
         invoicesForm.setBorder(BorderFactory.createTitledBorder("Invoices Table"));
         invoicesForm.add(invoicesTable);
-//        invoicesTable.setEnabled(false);
-//        invoicesTable.setCellEditor(Disabled );
-////        invoicesTable.getCellEditor();
-//        invoicesTable.setColumnSelectionAllowed(false);
-//        for (int i = 0; i < invoicesTable.getRowCount(); i++)
-//        {
-//            for (int j = 0; j < invoicesTable.getColumnCount(); j++)
-//            {
-//                isCellEditable(i , j);
-//            }
-//        }
+        invoicesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+            @Override
+            public void valueChanged(ListSelectionEvent RowSelected) {
+                int selectedRow = invoicesTable.getSelectedRow();
+                if (selectedRow > 0)
+                {
+                    customerName.setEnabled(true);
+                    invoiceDate.setEnabled(true);
+                    Invoice.getInvoiceHeader(selectedRow);
+                    ScanInvoiceItems();
+                    invoiceItemsTable.setEnabled(true);
+                    createNewLine.setEnabled(true);
+                    deleteLine.setEnabled(true);
+                    FileOperations.readFile();
+                }
+            }
+        });
+        isCellEditable(0,3);
         invoicesTable.setRowSelectionAllowed(true);
+
         invoicesForm.add(invoicesFooterButtons);
         Controller.addInvoicesTableHeader();
 
@@ -148,7 +158,6 @@ public class InvoiceFrame extends JFrame implements ActionListener
         invoiceHeaderForm.add(customerNameForm);
         invoiceHeaderForm.add(invoiceTotalForm);
 
-
         invoiceItemsForm.setBorder(BorderFactory.createTitledBorder("Invoice Items"));
         invoiceItemsForm.setLayout(new GridLayout(1, 1));
         invoiceItemsForm.add(invoiceItemsTable);
@@ -161,11 +170,6 @@ public class InvoiceFrame extends JFrame implements ActionListener
 
         setJMenuBar(mainMenuBar);
         add(mainPanel);
-    }
-
-    public boolean isCellEditable(int row, int column)
-    {
-        return (false);
     }
 
     public void actionPerformed(ActionEvent ButtonPressed) {
@@ -187,28 +191,54 @@ public class InvoiceFrame extends JFrame implements ActionListener
         }
         if (ButtonPressed.getActionCommand().equals("CreateNewInvoicePressed"))
         {
+            customerName.setText("");
+            invoiceDate.setText("");
             customerName.setEnabled(true);
             invoiceDate.setEnabled(true);
+            invoiceTotal.setText("");
             invoiceNumValue = invoiceNumValue + 1;
             invoiceNum.setText(String.valueOf(invoiceNumValue));
+            invoiceItemsTable.setEnabled(true);
+            for (int x = 1 ; x < invoiceItemsTable.getRowCount();x=1 )
+            {
+                invoiceLinesTable.removeRow(x);
+            }
             createNewLine.setEnabled(true);
             deleteLine.setEnabled(true);
         }
         if (ButtonPressed.getActionCommand().equals("DeleteInvoicePressed"))
         {
-            invoicesHeaderTable.removeRow(invoicesTable.getSelectedRow());
+                invoicesHeaderTable.removeRow(invoicesTable.getSelectedRow());
         }
         if (ButtonPressed.getActionCommand().equals("CreateNewLinePressed"))
         {
             invoiceItemsTable.setEnabled(true);
+            invoiceLinesTable.insertRow(invoiceItemsTable.getRowCount(),new Object[]{"","","","",""});
         }
         if (ButtonPressed.getActionCommand().equals("DeleteLinePressed"))
         {
-            invoiceLinesTable.removeRow(invoiceItemsTable.getSelectedRow());
+//            int selectedRow = invoiceItemsTable.getSelectedRow();
+//            if(selectedRow>0)
+//            {
+                invoiceLinesTable.removeRow(invoiceItemsTable.getSelectedRow());
+//            }
+//            else
+//            {
+//                JOptionPane.showMessageDialog(null, "No Line has been Selected to be Deleted",
+//                        "No Line Selected", JOptionPane.ERROR_MESSAGE);
+//            }
         }
     }
     public static void main(String[] args)
     {
         new InvoiceFrame().setVisible(true);
+    }
+    public boolean isCellEditable(int row, int column)
+    {
+        if (column==0 || column==3)
+        {
+            return (false);
+        }
+        return true;
     }
 }
