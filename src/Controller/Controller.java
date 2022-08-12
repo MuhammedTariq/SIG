@@ -2,10 +2,12 @@ package Controller;
 
 import Model.Invoice;
 import Model.InvoicesTable;
+import View.InvoiceFrame;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
+import java.util.ArrayList;
 
 import static Model.Invoice.*;
 
@@ -20,6 +22,9 @@ public class Controller extends InvoicesTable
             (DefaultTableModel) invoicesTable.getModel();
     public static DefaultTableModel invoiceLinesTable =
             (DefaultTableModel) invoiceItemsTable.getModel();
+
+    private static ArrayList<String> itemInvoiceNum = new ArrayList<String>();
+//    private static ArrayList<[]> itemInvoiceNum ;
 
     public static void ScanInvoicesHeader() {
         try {
@@ -67,7 +72,8 @@ public class Controller extends InvoicesTable
         }
     }
     public static void ScanInvoiceItems() {
-        try {
+        try
+        {
             JFileChooser SelectForm = new JFileChooser();
             int SelectionResult = SelectForm.showOpenDialog(null);
             if (SelectionResult == JFileChooser.APPROVE_OPTION)
@@ -75,13 +81,47 @@ public class Controller extends InvoicesTable
                 String FilePath = SelectForm.getSelectedFile().getPath();
                 CSVReader = new BufferedReader(new FileReader(FilePath));
                 ValuesData = CSVReader.lines().toArray();
-                for (int i = 0; i < ValuesData.length; i++)
-                {
+                for (int i = 0; i < ValuesData.length; i++) {
                     Line = ValuesData[i].toString().trim();
                     ValuesRow = Line.split(",");
                     invoiceLinesTable.addRow(ValuesRow);
                 }
-            }
+//                for (int v = 1; v < invoiceItemsTable.getRowCount() ; v++)
+//                {
+//                    if (selectedInvoiceNum != invoiceLinesTable.getValueAt(v, 0)) {
+//                        invoiceLinesTable.removeRow(v);
+//                    }
+//                }
+
+//                    String itemInvoiceNum = (String) invoiceItemsTable.getValueAt(v,0);
+//                    if (selectedInvoiceNum != itemInvoiceNum)
+//                    {
+//                        invoiceLinesTable.removeRow(v);
+//                    }
+//                    if (v == invoiceItemsTable.getRowCount()) {v=0;}
+//                }
+
+                for (int v = 1; v < invoiceItemsTable.getRowCount(); v++)
+                {
+                    itemInvoiceNum.add((String) invoiceItemsTable.getValueAt(v, 0));
+                }
+                    while (invoiceItemsTable.getRowCount() > 1 && itemInvoiceNum.contains(1))
+                    {
+                        for (int z = 1; z < invoiceItemsTable.getRowCount() ; z++)
+                        {
+                            if (selectedInvoiceNum != itemInvoiceNum.get(z))
+                            {
+                                //invoiceLinesTable.removeRow(invoiceItemsTable.getRowCount());
+                                itemInvoiceNum.remove(z);
+                                invoiceLinesTable.removeRow(z);
+                            }
+                            if (z == invoiceItemsTable.getRowCount()) {z=0;}
+                        }
+                    }
+                JOptionPane.showMessageDialog(null,
+                        "Only Items Related to the Selected Invoice have been Loaded",
+                        "Loaded Items", JOptionPane.INFORMATION_MESSAGE);
+                }
             else
             {
                 JOptionPane.showMessageDialog(null , "There is No File Loaded" ,

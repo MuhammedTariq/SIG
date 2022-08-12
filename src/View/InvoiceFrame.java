@@ -62,6 +62,7 @@ public class InvoiceFrame extends JFrame implements ActionListener
     private JPanel invoiceDateForm = new JPanel();
     private JPanel customerNameForm = new JPanel();
     private JPanel invoiceTotalForm = new JPanel();
+    public static String selectedInvoiceNum ;
 
     public InvoiceFrame()
     {
@@ -111,11 +112,16 @@ public class InvoiceFrame extends JFrame implements ActionListener
             @Override
             public void valueChanged(ListSelectionEvent RowSelected) {
                 int selectedRow = invoicesTable.getSelectedRow();
-                if (selectedRow > 0)
+                if (selectedRow > 0 && selectedRow <= invoicesHeaderTable.getRowCount())
                 {
+                    selectedInvoiceNum = (String) invoicesHeaderTable.getValueAt(selectedRow,0);
                     customerName.setEnabled(true);
                     invoiceDate.setEnabled(true);
                     Invoice.getInvoiceHeader(selectedRow);
+                    for (int x = 1 ; x < invoiceItemsTable.getRowCount();x=1 )
+                    {
+                        invoiceLinesTable.removeRow(x);
+                    }
                     ScanInvoiceItems();
                     invoiceItemsTable.setEnabled(true);
                     createNewLine.setEnabled(true);
