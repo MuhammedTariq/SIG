@@ -1,9 +1,5 @@
 package Model;
 
-import View.InvoiceFrame;
-
-import java.util.ArrayList;
-
 import static Controller.Controller.invoicesHeaderTable;
 import static View.InvoiceFrame.*;
 
@@ -16,9 +12,9 @@ public class Invoice extends Line
     //ArrayList<Line()>;
     public static void getInvoiceHeader(int selectedRow)
     {
-        invoiceNum.setText((String) invoicesHeaderTable.getValueAt(selectedRow,0));
-        invoiceDate.setText((String) invoicesHeaderTable.getValueAt(selectedRow,1));
-        customerName.setText((String) invoicesHeaderTable.getValueAt(selectedRow,2));
-        invoiceTotal.setText((String) invoicesHeaderTable.getValueAt(selectedRow,3));
+        invoiceNumField.setText((String) invoicesHeaderTable.getValueAt(selectedRow,0));
+        invoiceDateField.setText((String) invoicesHeaderTable.getValueAt(selectedRow,1));
+        customerNameField.setText((String) invoicesHeaderTable.getValueAt(selectedRow,2));
+        invoiceTotalField.setText((String) invoicesHeaderTable.getValueAt(selectedRow,3));
     }
 }
