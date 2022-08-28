@@ -1,11 +1,14 @@
 package Controller;
 
+import Model.Invoice;
 import Model.InvoicesTable;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.io.*;
 import java.util.Objects;
+
+import static java.lang.Double.parseDouble;
 
 public class Controller extends InvoicesTable
 {
@@ -65,24 +68,10 @@ public class Controller extends InvoicesTable
         try {
             JFileChooser SelectForm = new JFileChooser();
             int SelectionResult = SelectForm.showOpenDialog(null);
-            if (SelectionResult == JFileChooser.APPROVE_OPTION)
-            {
+            if (SelectionResult == JFileChooser.APPROVE_OPTION) {
                 String FilePath = SelectForm.getSelectedFile().getPath();
                 CSVReader = new BufferedReader(new FileReader(FilePath));
                 ValuesData = CSVReader.lines().toArray();
-                for (Object valuesDatum : ValuesData)
-                {
-                    Line = valuesDatum.toString().trim();
-                    ValuesRow = Line.split(",");
-                    if (Objects.equals(ValuesRow[0], selectedInvoiceNum))
-                    {
-                        invoiceLinesTable.addRow(ValuesRow);
-                    }
-                }
-
-                JOptionPane.showMessageDialog(null,
-                        "Only Items Related to the Selected Invoice have been Loaded",
-                        "Loaded Items", JOptionPane.INFORMATION_MESSAGE);
             }
             else
             {
@@ -107,7 +96,41 @@ public class Controller extends InvoicesTable
             }
         }
     }
-
+    public static void filterItems() {
+        for (Object valuesDatum : ValuesData) {
+            Line = valuesDatum.toString().trim();
+            ValuesRow = Line.split(",");
+            if (Objects.equals(ValuesRow[0], selectedInvoiceNum)) {
+                invoiceLinesTable.addRow(ValuesRow);
+            }
+        }
+        JOptionPane.showMessageDialog(null,
+                "Only Items Related to the Selected Invoice have been Loaded",
+                "Loaded Items", JOptionPane.INFORMATION_MESSAGE);
+        calculateTotals();
+    }
+    public static void calculateTotals()
+    {
+        Invoice.invoiceTotalValue = 00.00;
+        for (int y = 1; y < invoiceItemsTable.getRowCount(); y++) {
+            if (invoiceItemsTable.getValueAt(y, 2) != null &&
+                    invoiceItemsTable.getValueAt(y, 3) != null)
+            {
+                double itemPrice = Double.valueOf((String) invoiceItemsTable.getValueAt(y, 2));
+                double itemCount = Double.valueOf((String) invoiceItemsTable.getValueAt(y, 3));
+                double itemTotal = itemPrice * itemCount;
+                invoiceItemsTable.setValueAt(itemTotal, y, 4);
+                Invoice.invoiceTotalValue += itemTotal;
+            }
+            else
+            {
+                JOptionPane.showMessageDialog(null,
+                        "There are No Values to be Calculated", "Empty Strings"
+                        , JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        invoiceTotalField.setText(String.valueOf(Invoice.invoiceTotalValue));
+    }
     public static void SaveInvoiceHeader() throws IOException
     {
         JFileChooser SaveForm = new JFileChooser();

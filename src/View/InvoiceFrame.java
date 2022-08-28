@@ -103,17 +103,20 @@ public class InvoiceFrame extends JFrame implements ActionListener {
         invoicesForm.add(invoicesTable);
         invoicesTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
-            public void valueChanged(ListSelectionEvent RowSelected) {
+            public void valueChanged(ListSelectionEvent RowSelected)
+            {
                 int selectedRow = invoicesTable.getSelectedRow();
-                if (selectedRow > 0 && selectedRow <= invoicesHeaderTable.getRowCount()) {
+                if (selectedRow > 0 && selectedRow <= invoicesHeaderTable.getRowCount())
+                {
                     selectedInvoiceNum = (String) invoicesHeaderTable.getValueAt(selectedRow, 0);
                     customerNameField.setEnabled(true);
                     invoiceDateField.setEnabled(true);
                     Invoice.getInvoiceHeader(selectedRow);
-                    for (int x = 1; x < invoiceItemsTable.getRowCount(); x = 1) {
+                    for (int x = 1; x < invoiceItemsTable.getRowCount(); x = 1)
+                    {
                         invoiceLinesTable.removeRow(x);
                     }
-                    ScanInvoiceItems();
+                    filterItems();
                     invoiceItemsTable.setEnabled(true);
                     createNewLine.setEnabled(true);
                     deleteLine.setEnabled(true);
@@ -172,6 +175,7 @@ public class InvoiceFrame extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent ButtonPressed) {
         if (ButtonPressed.getActionCommand().equals("OpenPressed")) {
             Controller.LoadFile();
+            Controller.ScanInvoiceItems();
         }
         if (ButtonPressed.getActionCommand().equals("SavePressed")) {
             InvoicesTable.SaveFile();
@@ -224,11 +228,25 @@ public class InvoiceFrame extends JFrame implements ActionListener {
             invoiceItemsTable.setEnabled(true);
             invoiceLinesTable.insertRow(invoiceItemsTable.getRowCount(), new Object[]{"", "", "", "", ""});
         }
-        if (ButtonPressed.getActionCommand().equals("DeleteLinePressed")) {
+        invoiceItemsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener()
+        {
+            @Override
+            public void valueChanged(ListSelectionEvent e)
+            {
+//                int selectedRow = invoiceItemsTable.getSelectedRow();
+//                if (selectedRow > 0 && selectedRow <= invoiceItemsTable.getRowCount())
+//                {
+                    calculateTotals();
+//                }
+            }
+        });
+        if (ButtonPressed.getActionCommand().equals("DeleteLinePressed"))
+        {
             int selectedRow = invoiceItemsTable.getSelectedRow();
             if(selectedRow>0 && selectedRow<=invoiceItemsTable.getRowCount())
             {
             invoiceLinesTable.removeRow(invoiceItemsTable.getSelectedRow());
+            calculateTotals();
             }
             else
             {
