@@ -15,6 +15,7 @@ import java.awt.event.ActionListener;
 
 import static Controller.Controller.*;
 import static Model.Invoice.invoiceNumValue;
+import static Model.Invoice.invoiceTotalValue;
 
 public class InvoiceFrame extends JFrame implements ActionListener {
     public JFrame InvoiceFrame = new JFrame();
@@ -188,12 +189,16 @@ public class InvoiceFrame extends JFrame implements ActionListener {
             System.exit(0);
         }
         if (ButtonPressed.getActionCommand().equals("CreateNewInvoicePressed")) {
+            invoiceNumValue = invoiceNumValue + 1;
+            String [] AddedRow = {"","","",""};
+            invoicesHeaderTable.addRow(AddedRow);
+            int AddedRowNum = invoicesHeaderTable.getRowCount();
+            invoicesHeaderTable.setValueAt(invoiceNumValue,AddedRowNum-1,0);
             customerNameField.setText("");
             invoiceDateField.setText("");
             customerNameField.setEnabled(true);
             invoiceDateField.setEnabled(true);
             invoiceTotalField.setText("");
-            invoiceNumValue = invoiceNumValue + 1;
             invoiceNumField.setText(String.valueOf(invoiceNumValue));
             invoiceItemsTable.setEnabled(true);
             for (int x = 1; x < invoiceItemsTable.getRowCount(); x = 1)
@@ -236,7 +241,14 @@ public class InvoiceFrame extends JFrame implements ActionListener {
 //                int selectedRow = invoiceItemsTable.getSelectedRow();
 //                if (selectedRow > 0 && selectedRow <= invoiceItemsTable.getRowCount())
 //                {
-                    calculateTotals();
+                calculateTotals();
+                String invoiceDateValue = invoiceDateField.getText();
+                String invoiceCustomerName = customerNameField.getText();
+                int AddedRowNum = invoicesHeaderTable.getRowCount();
+                invoicesHeaderTable.setValueAt(invoiceNumValue,AddedRowNum-1,0);
+                invoicesHeaderTable.setValueAt(invoiceDateValue,AddedRowNum-1,1);
+                invoicesHeaderTable.setValueAt(invoiceCustomerName,AddedRowNum-1,2);
+                invoicesHeaderTable.setValueAt(invoiceTotalValue,AddedRowNum-1,3);
 //                }
             }
         });
